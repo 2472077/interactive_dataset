@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Dataset Cleaner</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body { background: #0f1117; color: #e0e0e0; }
+    .sidebar { background: #1a1d27; min-height: 100vh; border-right: 1px solid #2a2d3a; padding: 20px; }
+    .main    { background: #0f1117; padding: 24px; }
+    .card    { background: #1e2130; border: 1px solid #2a2d3a; border-radius: 10px; margin-bottom: 16px; }
+    .card-header { background: #22253a; border-bottom: 1px solid #2a2d3a; font-size: 13px; font-weight: 600; color: #a0a8c0; }
+    .form-control, .form-select { background: #12141f; border: 1px solid #353848; color: #e0e0e0; font-size: 13px; }
+    .form-control:focus, .form-select:focus { background: #12141f; color: #e0e0e0; border-color: #5b6af0; box-shadow: none; }
+    .form-label { font-size: 12px; color: #9099b0; margin-bottom: 4px; }
+    .btn-primary   { background: #5b6af0; border-color: #5b6af0; font-size: 13px; }
+    .btn-danger    { background: #e05b5b; border-color: #e05b5b; font-size: 13px; }
+    .btn-success   { background: #3aaa6f; border-color: #3aaa6f; font-size: 13px; }
+    .btn-secondary { background: #353848; border-color: #353848; font-size: 13px; }
+    table  { font-size: 12px; }
+    thead  { background: #22253a; }
+    th, td { border-color: #2a2d3a !important; color: #e0e0e0; white-space: nowrap; }
+    tr:hover td { background: #1e2233; }
+    .null-cell { color: #606880; font-style: italic; }
+    .upload-zone { border: 2px dashed #353848; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; }
+    .upload-zone:hover { border-color: #5b6af0; }
+    h1 { font-size: 22px; font-weight: 700; }
+    .badge-shape { background: #22253a; color: #8090b0; padding: 4px 10px; border-radius: 6px; font-size: 12px; }
+    option { background: #12141f; color: #e0e0e0; }
+    select[multiple] { height: 90px; }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+<div class="row">
+
+  <!-- ════════════ SIDEBAR ════════════ -->
+  <div class="col-md-3 sidebar">
+    <h5 class="text-light mb-3">🧹 Dataset Cleaner</h5>
+
+    {% if columns %}
+
+    <!-- Fill Missing -->
+    <div class="card">
+      <div class="card-header">Fill Missing Values</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/fill-missing">
+          <div class="mb-2">
+            <label class="form-label">Column</label>
+            <select name="column" class="form-select form-select-sm">
+              {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Method</label>
+            <select name="method" class="form-select form-select-sm">
+              <option value="mean">Mean</option>
+              <option value="median">Median</option>
+              <option value="mode">Mode</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Custom Value (if custom)</label>
+            <input type="text" name="custom_value" class="form-control form-control-sm" placeholder="e.g. 0 or Unknown"/>
+          </div>
+          <button class="btn btn-primary btn-sm w-100">Apply</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Drop Missing / Duplicates -->
+    <div class="card">
+      <div class="card-header">Row Operations</div>
+      <div class="card-body p-2 d-flex gap-2">
+        <form method="POST" action="/drop-missing" class="w-50">
+          <button class="btn btn-primary btn-sm w-100">Drop Missing</button>
+        </form>
+        <form method="POST" action="/remove-duplicates" class="w-50">
+          <button class="btn btn-primary btn-sm w-100">Remove Duplicates</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Standardize Text -->
+    <div class="card">
+      <div class="card-header">Standardize Text Column</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/standardize">
+          <div class="mb-2">
+            <label class="form-label">Column</label>
+            <select name="column" class="form-select form-select-sm">
+              {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Method</label>
+            <select name="method" class="form-select form-select-sm">
+              <option value="lowercase">Lowercase</option>
+              <option value="uppercase">Uppercase</option>
+              <option value="titlecase">Title Case</option>
+              <option value="date">Date Format</option>
+            </select>
+          </div>
+          <input type="hidden" name="decimal_places" value="2"/>
+          <button class="btn btn-primary btn-sm w-100">Apply</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Round Numeric -->
+    <div class="card">
+      <div class="card-header">Round Numeric Column</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/standardize">
+          <div class="mb-2">
+            <label class="form-label">Column</label>
+            <select name="column" class="form-select form-select-sm">
+              {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Decimal Places</label>
+            <input type="number" name="decimal_places" class="form-control form-control-sm" value="2" min="0" max="10"/>
+          </div>
+          <input type="hidden" name="method" value="round"/>
+          <button class="btn btn-primary btn-sm w-100">Round</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Outliers / Normalize -->
+    <div class="card">
+      <div class="card-header">Outliers / Normalize</div>
+      <div class="card-body p-2">
+        <div class="mb-2">
+          <label class="form-label">Column</label>
+        </div>
+        <form method="POST" action="/remove-outliers" class="mb-2">
+          <select name="column" class="form-select form-select-sm mb-2">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="nonnegative_only" id="nonnegCheck">
+            <label class="form-check-label" for="nonnegCheck">Enforce non-negative values</label>
+          </div>
+          <button class="btn btn-primary btn-sm w-100">Remove Outliers</button>
+        </form>
+        <form method="POST" action="/normalize">
+          <select name="column" class="form-select form-select-sm mb-2">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-primary btn-sm w-100">Normalize</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- One-Hot Encoding -->
+    <div class="card">
+      <div class="card-header">One-Hot Encoding</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/one-hot-encoding">
+          <label class="form-label">Columns (hold Cmd/Ctrl to multi-select)</label>
+          <select name="columns" class="form-select form-select-sm mb-2" multiple>
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-primary btn-sm w-100">Apply</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Linear Regression -->
+    <div class="card">
+      <div class="card-header">Linear Regression</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/linear-regression">
+          <label class="form-label">Feature 1</label>
+          <select name="feature1" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Feature 2</label>
+          <select name="feature2" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Target</label>
+          <select name="target" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Predict (val1, val2)</label>
+          <input type="text" name="predict_values" class="form-control form-control-sm mb-2" placeholder="e.g. 30, 70000"/>
+          <button class="btn btn-primary btn-sm w-100">Train & Predict</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Polynomial Regression -->
+    <div class="card">
+      <div class="card-header">Polynomial Regression</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/polynomial-regression">
+          <label class="form-label">Feature 1</label>
+          <select name="feature1" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Feature 2</label>
+          <select name="feature2" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Target</label>
+          <select name="target" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Degree</label>
+          <input type="number" name="degree" class="form-control form-control-sm mb-1" value="2" min="1" max="5"/>
+          <label class="form-label">Predict (val1, val2)</label>
+          <input type="text" name="predict_values" class="form-control form-control-sm mb-2" placeholder="e.g. 30, 70000"/>
+          <button class="btn btn-primary btn-sm w-100">Train & Predict</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- KNN -->
+    <div class="card">
+      <div class="card-header">K-NN Classifier</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/knn">
+          <label class="form-label">Features (hold Cmd/Ctrl to multi-select)</label>
+          <select name="feature_columns" class="form-select form-select-sm mb-1" multiple>
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">Target</label>
+          <select name="target_column" class="form-select form-select-sm mb-1">
+            {% for col in columns %}<option>{{ col }}</option>{% endfor %}
+          </select>
+          <label class="form-label">K Neighbours</label>
+          <input type="number" name="k" class="form-control form-control-sm mb-1" value="3" min="1"/>
+          <label class="form-label">Predict (comma-separated)</label>
+          <input type="text" name="predict_values" class="form-control form-control-sm mb-2" placeholder="e.g. 30, 70000"/>
+          <button class="btn btn-primary btn-sm w-100">Train & Predict</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- NLP Query -->
+    <div class="card">
+      <div class="card-header">NLP Query</div>
+      <div class="card-body p-2">
+        <form method="POST" action="/nlp-query">
+          <input type="text" name="query" class="form-control form-control-sm mb-2"
+                 placeholder="e.g. fill missing Salary with median"/>
+          <button class="btn btn-primary btn-sm w-100">Run</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Reset -->
+    <form method="POST" action="/reset">
+      <button class="btn btn-danger w-100">🔄 Reset Session</button>
+    </form>
+
+    {% endif %}
+  </div>
+
+  <!-- ════════════ MAIN ════════════ -->
+  <div class="col-md-9 main">
+
+    <!-- Top bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="text-white">Interactive Dataset Cleaner</h1>
+      {% if table %}
+      <div class="d-flex gap-2 align-items-center">
+        <span class="badge-shape">{{ table.shape[0] }} rows × {{ table.shape[1] }} cols</span>
+        <a href="/download"><button class="btn btn-success btn-sm">⬇ Download CSV</button></a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Alerts -->
+    {% if success %}
+    <div class="alert alert-success py-2 px-3" style="background:#1a2a1a;border-color:#3aaa6f;color:#8f9;">
+      ✅ {{ success }}
+    </div>
+    {% endif %}
+    {% if error %}
+    <div class="alert alert-danger py-2 px-3" style="background:#2a1a1a;border-color:#e05b5b;color:#f88;">
+      ❌ {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Prediction result -->
+    {% if prediction is defined and prediction is not none %}
+    <div class="alert py-2 px-3 mb-3" style="background:#1a2233;border-color:#5b6af0;color:#adf;">
+      🎯 Prediction: <strong>{{ prediction }}</strong>
+      {% if r_squared is defined and r_squared is not none %}
+        &nbsp;|&nbsp; R²: <strong>{{ r_squared }}</strong>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Upload zone (no file loaded) -->
+    {% if not table %}
+    <div class="upload-zone mt-5">
+      <form method="POST" action="/" enctype="multipart/form-data">
+        <p class="text-secondary mb-3" style="font-size:15px;">Upload a CSV, Excel or JSON file to get started</p>
+        <input type="file" name="file" accept=".csv,.xlsx,.json" class="form-control form-control-sm mx-auto mb-3" style="max-width:300px"/>
+        <button class="btn btn-primary">Upload File</button>
+      </form>
+    </div>
+
+    {% else %}
+
+    <!-- Dataset Table -->
+    <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;">
+      <table class="table table-dark table-bordered table-hover table-sm">
+        <thead class="sticky-top">
+          <tr>
+            {% for col in table.columns %}
+            <th>{{ col }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in table.data %}
+          <tr>
+            {% for col in table.columns %}
+            {% if row[col] is none %}
+            <td class="null-cell">None</td>
+            {% else %}
+            <td>{{ row[col] }}</td>
+            {% endif %}
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+</div>
+</body>
+</html>

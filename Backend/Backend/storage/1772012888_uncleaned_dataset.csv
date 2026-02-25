@@ -1,0 +1,22 @@
+
+id,name,email,city,join_date,amount,score,category,subcategory,age,height_cm,salary,feat1,feat2,target_class,target_reg
+1,"  alice  ","Alice@example.COM"," new york ","2024-01-15",100.5,88,Electronics,Mobile,29,165,55000,1.2,3.4,yes,120.5
+2,"BOB","bob@EXAMPLE.com","Los Angeles","15-01-2024",,92,Fashion,Men,35,180,62000,2.3,4.5,no,130.0
+3,"ChArLiE","charlie@example.com","Chicago","01/16/2024",230.99,,Home,"Kitchen",,172,48000,3.1,2.2,yes,115.2
+4,"diana","diana@example.com","chicago","2024/01/17",-12.4,76,Home,,41,158,51000,0.0,0.0,yes,98.3
+5,"Eve","eve@example.com","San Francisco","17/01/2024",9999999,45,Electronics,TV,28,170,70000,5.5,1.2,no,210.1
+6,"frank","frank@example.com"," san francisco ","2024-13-01",56.78,88,Toys,Kids,33,,56000,2.2,3.3,yes,122.0
+7,"grace","grace@example.com","New   York","2024-01-18",,,Electronics,Laptop,27,165,57000,1.2,3.4,yes,119.9
+8,"Heidi","heidi@example.com","new york","18-01-2024",75.0,100,Fashion,Women,31,167,59000,4.4,2.1,no,141.3
+9,"ivan","ivan@example.com","LOS ANGELES","01-18-2024",,60,Fashion,Men,39,181,,1.9,3.8,yes,125.0
+10,"Judy","judy@example.com","chicago","2024/01/19",34.56,72,Home,Decor,44,160,52000,2.2,3.3,no,110.8
+11,"mallory","MALLORY@EXAMPLE.COM","Bengaluru","2024-01-20",100.5,88,Electronics,Mobile,29,165,55000,1.2,3.4,yes,120.5
+12," oscar","oscar@example.com","bengaluru","20/01/2024",,92,Home,Decor,35,180,62000,2.3,4.5,no,130.0
+13,"peggy","peggy@example.com","Bengaluru","2024/01/21",230.99,,Toys,Kids,,172,48000,3.1,2.2,yes,115.2
+14,"trent","trent@example.com","BENGALURU","21-01-2024",-12.4,76,Home,Kitchen,41,158,51000,0.0,0.0,yes,98.3
+15,"Victor","victor@example.com","Bengaluru","2024-01-22",56.78,88,Electronics,TV,33,170,56000,2.2,3.3,yes,122.0
+16,"walter","walter@example.com","Bengaluru","01/22/2024",, ,Toys,Kids,27,165,57000,1.2,3.4,yes,119.9
+17,"Yolanda","","Bengaluru","2024/01/23",75.0,100,Fashion,Women,31,167,59000,4.4,2.1,no,141.3
+18,"Zoe","zoe@example.com","bengaluru","2024-01-24","N/A",60,Fashion,Men,39,181,,1.9,3.8,yes,125.0
+19,"  alice  ","Alice@example.COM"," new york ","2024-01-15",100.5,88,Electronics,Mobile,29,165,55000,1.2,3.4,yes,120.5
+20,"NULL","null@example.com","Null","invalid",12.3,50,,Misc,, , ,0.0,0.0,,0
